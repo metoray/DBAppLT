@@ -1,5 +1,6 @@
 package unwdmi.dbapp;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumMap;
 
@@ -21,7 +22,7 @@ public class Measurement {
         PRCP,
         SNDP,
         CLDC,
-        WINDDIR
+        WNDDIR
     }
 
     private EnumMap<Type,Number> data;
@@ -36,5 +37,26 @@ public class Measurement {
         this.data = data;
         this.date = date;
         this.stationID = stationID;
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString;
+        if(date!=null){
+            dateString = format.format(date);
+        }
+        else {
+            dateString = "MISSING";
+        }
+        sb.append("MEASUREMENT\nStation: "+stationID+"\nDate: "+dateString+"\n");
+        for(Type type: Type.values()){
+            if(data.containsKey(type)) {
+                sb.append(String.format("%s: %s%n", type, data.get(type)));
+            } else {
+                sb.append(String.format("%s: MISSING%n",type));
+            }
+        }
+        return sb.toString();
     }
 }
