@@ -12,20 +12,7 @@ public class Measurement {
     private Date date;
     private int stationID;
 
-    public static enum Type{
-        TEMP,
-        DEWP,
-        STP,
-        SLP,
-        VISIB,
-        WDSP,
-        PRCP,
-        SNDP,
-        CLDC,
-        WNDDIR
-    }
-
-    private EnumMap<Type,Number> data;
+    private EnumMap<MeasurementType,Number> data;
 
     /**
      * Constructor for measurement
@@ -33,7 +20,7 @@ public class Measurement {
      * @param date the date and time the measurement was made
      * @param data an array containing all measurements in the order described in types.
      */
-    public Measurement(int stationID, Date date, EnumMap<Type,Number> data){
+    public Measurement(int stationID, Date date, EnumMap<MeasurementType,Number> data){
         this.data = data;
         this.date = date;
         this.stationID = stationID;
@@ -50,7 +37,7 @@ public class Measurement {
             dateString = "MISSING";
         }
         sb.append("MEASUREMENT\nStation: "+stationID+"\nDate: "+dateString+"\n");
-        for(Type type: Type.values()){
+        for(MeasurementType type: MeasurementType.values()){
             if(data.containsKey(type)) {
                 sb.append(String.format("%s: %s%n", type, data.get(type)));
             } else {
