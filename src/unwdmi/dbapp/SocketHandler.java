@@ -5,8 +5,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.SAXParser;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -28,9 +30,19 @@ public class SocketHandler extends Thread {
 
     public void run(){
         try {
-            InputSource src = new InputSource(new InputStreamReader(this.sock.getInputStream()));
             DefaultHandler handler = new XMLHandler(queue);
-            this.parser.parse(src,handler);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("<?xml")&&sb.length()!=0) {
+//                    System.out.println(sb.toString());
+                    this.parser.parse(new InputSource(new StringReader(sb.toString())), handler);
+                    sb = new StringBuilder();
+                }
+                sb.append(line+"\n");
+            }
+
         } catch (IOException | SAXException e) {
             e.printStackTrace();
         }
