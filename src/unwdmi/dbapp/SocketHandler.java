@@ -30,13 +30,15 @@ public class SocketHandler extends Thread {
 
     public void run(){
         try {
+            //Create instance of handler to put measurements on the queue
             DefaultHandler handler = new XMLHandler(queue);
+            //Make readers and buffers to read and process socket inputstream
             BufferedReader reader = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
             StringBuilder sb = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
+                //Process stringbuilder buffer when XML header is found
                 if (line.startsWith("<?xml")&&sb.length()!=0) {
-//                    System.out.println(sb.toString());
                     this.parser.parse(new InputSource(new StringReader(sb.toString())), handler);
                     sb = new StringBuilder();
                 }

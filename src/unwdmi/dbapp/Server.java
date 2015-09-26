@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -18,11 +19,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class Server {
 
-    public static void p(Object o){
-        System.out.println(o);
+    private HashMap<Integer,Station> stations;
+    public static final Server instance = new Server();
+
+    public Server(){
+        stations = new HashMap<>();
     }
 
     public static void main(String[] args) throws IOException {
+        instance.run();
+    }
+
+    public void run() throws IOException {
         ServerSocket sock = new ServerSocket(7789);
         SAXParserFactory factory = SAXParserFactory.newInstance();
         while(true) {
@@ -36,5 +44,12 @@ public class Server {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Station getStation(int id){
+        if(!this.stations.containsKey(id)){
+            this.stations.put(id,new Station(id));
+        }
+        return this.stations.get(id);
     }
 }
