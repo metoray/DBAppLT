@@ -2,13 +2,13 @@
 package unwdmi.dbapp;
 import java.util.*;
 
-//Extrapolation methods. temporarily saved in a separate class
-public class extrapolation_method_storage {
+//extrapolate methods. temporarily saved in a separate class
+public class ExtrapolationMethodStorage {
 
 	// Double ArrayList<Double> data
 	// Extrapolates and returns the new value based on the dataset.
 	// 
-	public double Extrapolation(ArrayList<Double> data){
+	public double extrapolate(ArrayList<Double> data){
 		double avgChange;
 		double totalChange = 0;
 		double lastValue = data.get(0);
@@ -26,8 +26,8 @@ public class extrapolation_method_storage {
 	 * 	ArrayList<Double> data
 	 *	Extrapolates new temperature, then calculates if measured temperature is within +-20% bounds
 	 */
-	public double temperatureExtrapolation(ArrayList<Double> data, double temperature){
-		double extrapolatedValue = Extrapolation(data);
+	public double extrapolateTemerature(ArrayList<Double> data, double temperature){
+		double extrapolatedValue = extrapolate(data);
 		if(temperature > extrapolatedValue*1.2){
 			return extrapolatedValue * 1.2;
 		}
