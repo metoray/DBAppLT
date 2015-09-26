@@ -26,7 +26,7 @@ public class ExtrapolationMethodStorage {
 	 * 	ArrayList<Double> data
 	 *	Extrapolates new temperature, then calculates if measured temperature is within +-20% bounds
 	 */
-	public double extrapolateTemerature(ArrayList<Double> data, double temperature){
+	public double extrapolateTemperature(ArrayList<Double> data, double temperature){
 		double extrapolatedValue = extrapolate(data);
 		if(temperature > extrapolatedValue*1.2){
 			return extrapolatedValue * 1.2;

@@ -36,7 +36,7 @@ public class Measurement {
         else {
             dateString = "MISSING";
         }
-        sb.append("MEASUREMENT\nStation: "+stationID+"\nDate: "+dateString+"\n");
+        sb.append("MEASUREMENT\nStation: ").append(stationID).append("\nDate: ").append(dateString).append("\n");
         for(MeasurementType type: MeasurementType.values()){
             if(data.containsKey(type)) {
                 sb.append(String.format("%s: %s%n", type, data.get(type)));
@@ -45,5 +45,13 @@ public class Measurement {
             }
         }
         return sb.toString();
+    }
+
+    public boolean hasData(MeasurementType type){
+        return data.containsKey(type);
+    }
+
+    public Number getData(MeasurementType type){
+        return data.get(type);
     }
 }
