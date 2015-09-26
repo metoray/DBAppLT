@@ -8,7 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by metoray on 23-9-15.
@@ -21,15 +21,14 @@ public class XMLHandler extends DefaultHandler {
     private String dateString;
     private String timeString;
     private int stationID;
-    private ConcurrentLinkedQueue<Measurement> queue;
+    private BlockingQueue<Measurement> queue;
 
-    public XMLHandler(ConcurrentLinkedQueue<Measurement> queue){
+    public XMLHandler(BlockingQueue<Measurement> queue){
         this.queue = queue;
     }
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        System.out.println(qName); //TODO Remove
         acc.setLength(0); //remove all characters from acc to read text from element
         if (qName.equalsIgnoreCase("MEASUREMENT")) {
             properties = new EnumMap<>(MeasurementType.class);
@@ -65,8 +64,11 @@ public class XMLHandler extends DefaultHandler {
                     date = null;
                 }
                 Measurement measurement = new Measurement(stationID, date, properties);
-                System.out.println(measurement.toString());
-                queue.add(measurement);
+                try {
+                    queue.put(measurement);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 break;
             case "DATE":
                 dateString = acc.toString();

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.Socket;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by metoray on 25-9-15.
@@ -19,9 +19,9 @@ public class SocketHandler extends Thread {
 
     private final SAXParser parser;
     private Socket sock;
-    private ConcurrentLinkedQueue<Measurement> queue;
+    private BlockingQueue<Measurement> queue;
 
-    public SocketHandler(Socket sock, SAXParser parser,ConcurrentLinkedQueue<Measurement> queue){
+    public SocketHandler(Socket sock, SAXParser parser,BlockingQueue<Measurement> queue){
         this.sock = sock;
         this.parser = parser;
         this.queue = queue;

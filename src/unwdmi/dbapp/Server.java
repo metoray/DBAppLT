@@ -12,7 +12,9 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedTransferQueue;
 
 /**
  * Created by metoray on 23-9-15.
@@ -37,8 +39,10 @@ public class Server {
             try {
                 Socket s = sock.accept();
                 SAXParser parser = factory.newSAXParser();
-                ConcurrentLinkedQueue<Measurement> queue = new ConcurrentLinkedQueue<>();
+                BlockingQueue<Measurement> queue = new LinkedTransferQueue<>();
                 SocketHandler sh = new SocketHandler(s, parser, queue);
+                MeasurementPasser mp = new MeasurementPasser(queue);
+                mp.start();
                 sh.start();
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 e.printStackTrace();

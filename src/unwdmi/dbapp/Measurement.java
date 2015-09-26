@@ -54,4 +54,8 @@ public class Measurement {
     public Number getData(MeasurementType type){
         return data.get(type);
     }
+
+    public int getStationID() {
+        return stationID;
+    }
 }

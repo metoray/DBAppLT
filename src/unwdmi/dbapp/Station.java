@@ -20,6 +20,7 @@ public class Station {
     }
 
     public void addMeasurement(Measurement measurement){
+        System.out.println(String.format("Station %d receiving measurement!",id));
         for (MeasurementType type: measurements.keySet()){
             LinkedList<Number> data = measurements.get(type);
             if(measurement.hasData(type)){
