@@ -24,6 +24,9 @@ public class Server {
     private HashMap<Integer,Station> stations;
     public static final Server instance = new Server();
 
+    private static final int PASSER_THREADS = 8;
+    private BlockingQueue<Measurement>[] queues;
+
     public Server(){
         stations = new HashMap<>();
     }
@@ -35,22 +38,31 @@ public class Server {
     public void run() throws IOException {
         ServerSocket sock = new ServerSocket(7789);
         SAXParserFactory factory = SAXParserFactory.newInstance();
-        BlockingQueue<Measurement> queue = new LinkedTransferQueue<>();
-        MeasurementPasser mp = new MeasurementPasser(queue);
-        mp.start();
+        queues = new BlockingQueue[PASSER_THREADS];
+        for(int i=0; i<PASSER_THREADS; i++){
+            BlockingQueue<Measurement> queue = new LinkedTransferQueue<>();
+            MeasurementPasser mp = new MeasurementPasser(queue);
+            mp.start();
+            queues[i] = queue;
+        }
+        QueueMonitor qm = new QueueMonitor(queues);
+        qm.start();
+        int queueIndex = 0;
         while(true) {
             try {
                 Socket s = sock.accept();
                 SAXParser parser = factory.newSAXParser();
-                SocketHandler sh = new SocketHandler(s, parser, queue);
+                SocketHandler sh = new SocketHandler(s, parser, queues[queueIndex]);
                 sh.start();
+                queueIndex++;
+                queueIndex%=queues.length;
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public Station getStation(int id){
+    public synchronized Station getStation(int id){
         if(!this.stations.containsKey(id)){
             this.stations.put(id,new Station(id));
         }
