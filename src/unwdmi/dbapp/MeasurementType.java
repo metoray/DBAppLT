@@ -9,14 +9,14 @@ import java.util.List;
 public enum MeasurementType {
     TEMP("temperature"),
     DEWP("dewpoint"),
-    STP("???"),
-    SLP("???"),
+    STP("stationairpressure"),
+    SLP("seaairpressure"),
     VISIB("visibility"),
-    WDSP("???"),
-    PRCP("???"),
-    SNDP("???"),
-    CLDC("???"),
-    WNDDIR("???");
+    WDSP("windspeed"),
+    PRCP("rainfall"),
+    SNDP("snowdepth"),
+    CLDC("cloudcoverage"),
+    WNDDIR("winddirection");
 
     private String dbName;
 
