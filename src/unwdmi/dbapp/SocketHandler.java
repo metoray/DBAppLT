@@ -25,7 +25,7 @@ public class SocketHandler extends Thread {
         this.sock = sock;
         this.parser = parser;
         this.queue = queue;
-        this.setName("SocketHandler");
+        this.setName("SocketHandler-"+getId());
         this.setDaemon(true);
     }
 

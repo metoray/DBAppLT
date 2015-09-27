@@ -35,14 +35,14 @@ public class Server {
     public void run() throws IOException {
         ServerSocket sock = new ServerSocket(7789);
         SAXParserFactory factory = SAXParserFactory.newInstance();
+        BlockingQueue<Measurement> queue = new LinkedTransferQueue<>();
+        MeasurementPasser mp = new MeasurementPasser(queue);
+        mp.start();
         while(true) {
             try {
                 Socket s = sock.accept();
                 SAXParser parser = factory.newSAXParser();
-                BlockingQueue<Measurement> queue = new LinkedTransferQueue<>();
                 SocketHandler sh = new SocketHandler(s, parser, queue);
-                MeasurementPasser mp = new MeasurementPasser(queue);
-                mp.start();
                 sh.start();
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 e.printStackTrace();

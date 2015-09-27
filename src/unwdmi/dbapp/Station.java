@@ -24,8 +24,6 @@ public class Station {
     }
 
     public void addMeasurement(Measurement measurement){
-        System.out.println(String.format("Station %d receiving measurement!",id));
-        System.out.println(measurement.toString());
         dates.add(measurement.getDate());
         for (MeasurementType type: measurements.keySet()){
             LinkedList<Number> data = measurements.get(type);
