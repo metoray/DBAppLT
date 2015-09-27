@@ -58,4 +58,6 @@ public class Measurement {
     public int getStationID() {
         return stationID;
     }
+
+    public Date getDate() { return date; };
 }

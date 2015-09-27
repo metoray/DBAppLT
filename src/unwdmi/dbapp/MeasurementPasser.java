@@ -11,6 +11,7 @@ public class MeasurementPasser extends Thread {
 
     public MeasurementPasser(BlockingQueue<Measurement> queue){
         this.setDaemon(true);
+        this.setName("Passer");
         this.queue = queue;
     }
 
@@ -21,6 +22,8 @@ public class MeasurementPasser extends Thread {
                 int sid = m.getStationID();
                 Station station = Server.instance.getStation(sid);
                 station.addMeasurement(m);
+                Measurement correctedMeasurement = station.getLastMeasurement();
+                // pass correctedMeasurement to database saver
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
