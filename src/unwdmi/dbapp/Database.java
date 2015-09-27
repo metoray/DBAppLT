@@ -55,23 +55,31 @@ public class Database {
 		}
 	}
 	
-	public static void selectStatement(String colum){
+	public void selectStatement(int stationID, Date date){
 		
 		try{
-			//prepare connection
-			String myDriver = "com.mysql.jdbc.Driver";
-			String myUrl = "jdbc:mysql://localhost/test";
-			Class.forName(myDriver);
-			Connection conn = DriverManager.getConnection(myUrl, "root", "pass");
+			
 			//Select query
-			String query ="select "+colum+(" from measurment");
+			String query ="select * from measurment WHERE stn = "+stationID+" AND time ="+date.getTime();
 			Statement st = conn.createStatement();
 			ResultSet rs = st.executeQuery(query);
 			
 			//loop trough resultlist
 			while(rs.next()){
-				
-				System.out.println(rs.getDouble(colum));
+				System.out.println("ID: "+rs.getInt("ID"));
+				System.out.println("stn: "+rs.getInt("stn"));
+				System.out.println("time: "+rs.getTimestamp("time"));
+				System.out.println("temprature: "+rs.getDouble("temprature"));
+				System.out.println("dewpoint: "+rs.getDouble("dewpoint"));
+				System.out.println("stationairpressure: "+rs.getDouble("stationairpressure"));
+				System.out.println("seaairpressure: "+rs.getDouble("seaairpressure"));
+				System.out.println("visibility: "+rs.getDouble("visibility"));
+				System.out.println("windspeed: "+rs.getDouble("windspeed"));
+				System.out.println("rainfall: "+rs.getDouble("rainfall"));
+				System.out.println("snowdepth: "+rs.getDouble("snowdepth"));
+				System.out.println("events: "+rs.getInt("events"));
+				System.out.println("cloudcoverage: "+rs.getDouble("cloudcoverage"));
+				System.out.println("winddirection: "+rs.getInt("winddirection"));
 			}
 			
 	      }
