@@ -38,10 +38,7 @@ public enum MeasurementType {
      * @return extrapolated value
      */
     public double extrapolate(List<Number> data){
-        if(data.size()==0){
-            System.out.println(String.format("Can't extrapolate %s, no previous data available.",this.toString()));
-            return 0.0;
-        }
+        if(data.size()==0) return 0.0;
         double totalChange = 0;
         double lastValue = (Double)data.get(0);
         Iterator<Number> i = data.iterator();
@@ -62,6 +59,7 @@ public enum MeasurementType {
      * 	@return the temperature to be stored
      */
     public double extrapolateTemperature(List<Number> data, double temperature){
+        if(data.size()==0) return temperature;
         double extrapolatedValue = extrapolate(data);
         if(temperature > extrapolatedValue*1.2){
             return extrapolatedValue * 1.2;
@@ -97,6 +95,11 @@ public enum MeasurementType {
         return ((last + avgChange) % 360 + 360) % 360;
     }
 
+    /**
+     * Dethod for extrapolating new value for any type
+     * @param data data to extrapolate from
+     * @return new value
+     */
     public Number extrapolateValue(List<Number> data) {
         if(this==WNDDIR) {
             return extrapolateWindDir(data);
@@ -104,6 +107,12 @@ public enum MeasurementType {
         return extrapolate(data);
     }
 
+    /**
+     * Correct value if type is TEMP
+     * @param data data to extrapolate from
+     * @param value value to correct
+     * @return corrected value
+     */
     public Number correctValue(List<Number> data, Number value) {
         if(this==TEMP) {
             return extrapolateTemperature(data,(double)value);
