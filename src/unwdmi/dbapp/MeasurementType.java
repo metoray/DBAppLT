@@ -7,16 +7,26 @@ import java.util.List;
  * Created by metoray on 24-9-15.
  */
 public enum MeasurementType {
-    TEMP,
-    DEWP,
-    STP,
-    SLP,
-    VISIB,
-    WDSP,
-    PRCP,
-    SNDP,
-    CLDC,
-    WNDDIR;
+    TEMP("temperature"),
+    DEWP("dewpoint"),
+    STP("???"),
+    SLP("???"),
+    VISIB("visibility"),
+    WDSP("???"),
+    PRCP("???"),
+    SNDP("???"),
+    CLDC("???"),
+    WNDDIR("???");
+
+    private String dbName;
+
+    MeasurementType(String dbName){
+        this.dbName = dbName;
+    }
+
+    public String getColumnName(){
+        return this.dbName;
+    }
 
     public Number parse(String s){
         try {
