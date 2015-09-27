@@ -21,14 +21,20 @@ public class Station {
 
     public void addMeasurement(Measurement measurement){
         System.out.println(String.format("Station %d receiving measurement!",id));
+        System.out.println(measurement.toString());
         for (MeasurementType type: measurements.keySet()){
             LinkedList<Number> data = measurements.get(type);
+            Number value;
             if(measurement.hasData(type)){
-                data.push(measurement.getData(type));
+                value = measurement.getData(type);
+                value = type.correctValue(data,value);
             }
             else {
-                ;// extrapolate new value
+                value = type.extrapolateValue(data);
+                data.push(value);
             }
+            data.push(value);
+
             if(data.size()>30){
                 data.pop();
             }
