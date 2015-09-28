@@ -9,9 +9,9 @@ public class MeasurementPasser extends Thread {
 
     private BlockingQueue<Measurement> queue;
 
-    public MeasurementPasser(BlockingQueue<Measurement> queue){
+    public MeasurementPasser(BlockingQueue<Measurement> queue, String function){
         this.setDaemon(true);
-        this.setName("Passer-"+getId());
+        this.setName("Passer("+function+")-"+getId());
         this.setPriority(Thread.MAX_PRIORITY);
         this.queue = queue;
     }
@@ -22,8 +22,7 @@ public class MeasurementPasser extends Thread {
                 Measurement m = queue.take();
                 int sid = m.getStationID();
                 Station station = Server.instance.getStation(sid);
-                Measurement correctedMeasurement = station.addMeasurement(m);
-                // pass correctedMeasurement to database saver
+                station.addMeasurement(m);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
