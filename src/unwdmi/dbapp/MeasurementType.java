@@ -61,7 +61,7 @@ public enum MeasurementType {
             totalChange += d- lastValue;
             lastValue = d;
         }
-        double avgChange = totalChange / data.size();
+        double avgChange = totalChange / (data.size() - 1);
         return lastValue + avgChange;
     }
 
@@ -104,7 +104,7 @@ public enum MeasurementType {
                 change += 180;
             totalChange += change;
         }
-        int avgChange = totalChange / data.size();
+        int avgChange = totalChange / (data.size() - 1);
         return ((last + avgChange) % 360 + 360) % 360;
     }
 
