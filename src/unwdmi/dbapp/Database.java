@@ -9,11 +9,11 @@ public class Database {
 	
 	public Database(){
 		try{
-			String myDriver = "com.mysql.jdbc.Driver";
-			String myUrl = "jdbc:mysql://localhost/unwdmi";
-			Class.forName(myDriver);
-			this.conn = DriverManager.getConnection(myUrl, "root", "pass");
-		}catch(Exception ex)
+			String dbDriver = "com.mysql.jdbc.Driver";
+			String url = "jdbc:mysql://localhost/unwdmi";
+			Class.forName(dbDriver);
+			this.conn = DriverManager.getConnection(url, "root", "pass");
+		}catch(Exception ex)	//gotta catch 'em all!
 		{
 			System.out.println(ex);
 		}
@@ -80,7 +80,7 @@ public class Database {
 			}
 			
 	      }
-		catch(Exception ex){
+		catch(Exception ex){	//gotta catch 'em all!
 			System.out.println(ex);
 		}
 		

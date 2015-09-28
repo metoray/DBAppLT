@@ -23,7 +23,7 @@ public class Station {
         }
     }
 
-    public void addMeasurement(Measurement measurement){
+    public synchronized Measurement addMeasurement(Measurement measurement){
         dates.add(measurement.getDate());
         for (MeasurementType type: measurements.keySet()){
             LinkedList<Number> data = measurements.get(type);
@@ -41,9 +41,10 @@ public class Station {
                 data.pop();
             }
         }
+        return getLastMeasurement();
     }
 
-    public Measurement getLastMeasurement(){
+    private synchronized Measurement getLastMeasurement(){
         EnumMap<MeasurementType,Number> data = new EnumMap<MeasurementType, Number>(MeasurementType.class);
         for(Map.Entry<MeasurementType,LinkedList<Number>> entry: measurements.entrySet()){
             data.put(entry.getKey(),entry.getValue().peekLast());

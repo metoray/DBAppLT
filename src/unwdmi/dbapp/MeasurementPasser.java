@@ -22,8 +22,7 @@ public class MeasurementPasser extends Thread {
                 Measurement m = queue.take();
                 int sid = m.getStationID();
                 Station station = Server.instance.getStation(sid);
-                station.addMeasurement(m);
-                Measurement correctedMeasurement = station.getLastMeasurement();
+                Measurement correctedMeasurement = station.addMeasurement(m);
                 // pass correctedMeasurement to database saver
             } catch (InterruptedException e) {
                 e.printStackTrace();
