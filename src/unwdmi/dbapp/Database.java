@@ -12,10 +12,10 @@ public class Database {
 			String dbDriver = "com.mysql.jdbc.Driver";
 			String url = "jdbc:mysql://localhost/unwdmi";
 			Class.forName(dbDriver);
-			this.conn = DriverManager.getConnection(url, "root", "pass");
+			this.conn = DriverManager.getConnection(url, "unwdmi", ":(");
 		}catch(Exception ex)	//gotta catch 'em all!
 		{
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		
 	}
@@ -23,7 +23,7 @@ public class Database {
 	public void insertMeasurement(Measurement measurement) {
 		try {
 			MeasurementType[] types = MeasurementType.values();
-			String names = "(stn, date";
+			String names = "(stn, time";
 			for (MeasurementType type : types) {
 				names += "," + type.getColumnName();
 			}
@@ -46,8 +46,9 @@ public class Database {
 					preparedStmt.setDouble(i, value.doubleValue());
 				}
 			}
+			preparedStmt.executeUpdate();
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 	}
 	
@@ -80,7 +81,7 @@ public class Database {
 			
 	      }
 		catch(Exception ex){	//gotta catch 'em all!
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		
 	}

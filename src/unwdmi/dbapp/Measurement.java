@@ -48,7 +48,7 @@ public class Measurement {
     }
 
     public boolean hasData(MeasurementType type){
-        return data.containsKey(type);
+        return data.containsKey(type)&&(data.get(type)!=null);
     }
 
     public Number getData(MeasurementType type){

@@ -40,7 +40,7 @@ CREATE TABLE `Measurements` (
 `ID` int(10) unsigned AUTO_INCREMENT,
 `stn` int(10) unsigned NOT NULL,
 `time` TIMESTAMP NOT NULL,
-`temprature` double NOT NULL,
+`temperature` double NOT NULL,
 `dewpoint` double NOT NULL,
 `stationairpressure` double NOT NULL,
 `seaairpressure` double NOT NULL,

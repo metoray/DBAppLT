@@ -27,7 +27,7 @@ public class Server {
     private static final int PASSER_THREADS = 8;
     private BlockingQueue<Measurement>[] queues;
 
-    private static final int DB_PASSER_THREADS = 4;
+    private static final int DB_PASSER_THREADS = 1;
     private BlockingQueue<Measurement>[] dbQueues;
     private int dbqIndex = 0;
 

@@ -17,7 +17,7 @@ public enum MeasurementType {
     SNDP("snowdepth"),
     CLDC("cloudcoverage"),
     WNDDIR("winddirection"),
-    FRSHTT("???");
+    FRSHTT("events");
 
     private String dbName;
 
@@ -50,8 +50,9 @@ public enum MeasurementType {
      * @param data previous values to extrapolate from
      * @return extrapolated value
      */
-    public double extrapolate(List<Number> data){
+    public Double extrapolate(List<Number> data){
         if(data.size()==0) return 0.0;
+        if(data.size()==1) return (double)data.get(0);
         double totalChange = 0;
         double lastValue = (Double)data.get(0);
         Iterator<Number> i = data.iterator();
@@ -62,7 +63,7 @@ public enum MeasurementType {
             lastValue = d;
         }
         double avgChange = totalChange / (data.size() - 1);
-        return lastValue + avgChange;
+        return new Double(lastValue + avgChange);
     }
 
     /**
@@ -90,6 +91,8 @@ public enum MeasurementType {
      * @return the extrapolated value
      */
     public int extrapolateWindDir(List<Number> data){
+        if(data.size()==0) return 0;
+        if(data.size()==1) return (int)data.get(0);
         int totalChange = 0;
         int last = (int)data.get(0);
         Iterator<Number> it = data.iterator();
