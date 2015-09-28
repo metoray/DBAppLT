@@ -29,7 +29,7 @@ public class Database {
         }
         names += ")";
         //MAKE A QUERY USING THE NAMES VARIABLE HERE
-        String query = "INSERT INTO Measurements "+names+" VALUES(";
+        String query = "INSERT INTO Measurements "+names+" VALUES(?,?,";
         for(MeasurementType type: types){
         	query +="?,";
         }
