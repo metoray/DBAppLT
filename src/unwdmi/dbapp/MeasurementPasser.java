@@ -20,13 +20,17 @@ public class MeasurementPasser extends Thread {
         while(true){
             try {
                 Measurement m = queue.take();
-                int sid = m.getStationID();
-                Station station = Server.instance.getStation(sid);
-                station.addMeasurement(m);
+                this.handleMeasurement(m);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void handleMeasurement(Measurement m){
+        int sid = m.getStationID();
+        Station station = Server.instance.getStation(sid);
+        station.addMeasurement(m);
     }
 
 }

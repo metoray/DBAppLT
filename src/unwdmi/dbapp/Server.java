@@ -52,13 +52,13 @@ public class Server {
         }
         for(int i=0; i<DB_PASSER_THREADS; i++){
             BlockingQueue<Measurement> queue = new LinkedTransferQueue<>();
-            MeasurementPasser mp = new MeasurementPasser(queue,"DB");
-            mp.start();
+            DatabaseConsumer dc = new DatabaseConsumer(queue);
+            dc.start();
             dbQueues[i] = queue;
         }
-        QueueMonitor qm = new QueueMonitor(queues);
+        QueueMonitor qm = new QueueMonitor(queues,"STN");
         qm.start();
-        QueueMonitor dbqm = new QueueMonitor(dbQueues);
+        QueueMonitor dbqm = new QueueMonitor(dbQueues,"DB");
         dbqm.start();
         int queueIndex = 0;
         while(true) {
