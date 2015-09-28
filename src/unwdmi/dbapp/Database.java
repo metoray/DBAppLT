@@ -9,48 +9,44 @@ public class Database {
 	
 	public Database(){
 		try{
-			String myDriver = "com.mysql.jdbc.Driver";
-			String myUrl = "jdbc:mysql://localhost/unwdmi";
-			Class.forName(myDriver);
-			this.conn = DriverManager.getConnection(myUrl, "root", "pass");
-		}catch(Exception ex)
+			String dbDriver = "com.mysql.jdbc.Driver";
+			String url = "jdbc:mysql://localhost/unwdmi";
+			Class.forName(dbDriver);
+			this.conn = DriverManager.getConnection(url, "root", "pass");
+		}catch(Exception ex)	//gotta catch 'em all!
 		{
 			System.out.println(ex);
 		}
 		
 	}
-	public void insertMeasurement(Measurement measurement) {
 
-	try{
-		MeasurementType[] types = MeasurementType.values();
-        String names = "(stn, date";
-        for(MeasurementType type: types){
-            names += ","+type.getColumnName();
-        }
-        names += ")";
-        //MAKE A QUERY USING THE NAMES VARIABLE HERE
-        String query = "INSERT INTO Measurements "+names+" VALUES(?,?,";
-        for(MeasurementType type: types){
-        	query +="?,";
-        }
-        query = query.substring(0, query.length()-1);
-        query += ")"; 
-        PreparedStatement preparedStmt = conn.prepareStatement(query);
-        preparedStmt.setInt(1,measurement.getStationID());
-        preparedStmt.setTimestamp(2, new java.sql.Timestamp(measurement.getDate().getTime()));
-        int i=2;
-        for(MeasurementType type: types){
-    	   i++;
-    	   Number value = measurement.getData(type);
-           if(value instanceof Integer){
-        	   preparedStmt.setInt(i,value.intValue());
-           }
-           else{
-        	   preparedStmt.setDouble(i,value.doubleValue());
-        	   }
-           }
-        }
-		catch(Exception ex){
+	public void insertMeasurement(Measurement measurement) {
+		try {
+			MeasurementType[] types = MeasurementType.values();
+			String names = "(stn, date";
+			for (MeasurementType type : types) {
+				names += "," + type.getColumnName();
+			}
+			names += ")";
+			String query = "INSERT INTO Measurements "+names+" VALUES(?,?,";
+			for (int i=0; i<types.length; i++) {
+				query += "?"+((i==types.length-1)?"":",");
+			}
+			query += ")";
+			PreparedStatement preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setInt(1, measurement.getStationID());
+			preparedStmt.setTimestamp(2, new java.sql.Timestamp(measurement.getDate().getTime()));
+			int i = 2;
+			for (MeasurementType type : types) {
+				i++;
+				Number value = measurement.getData(type);
+				if (value instanceof Integer) {
+					preparedStmt.setInt(i, value.intValue());
+				} else {
+					preparedStmt.setDouble(i, value.doubleValue());
+				}
+			}
+		} catch (Exception ex) {
 			System.out.println(ex);
 		}
 	}
@@ -83,7 +79,7 @@ public class Database {
 			}
 			
 	      }
-		catch(Exception ex){
+		catch(Exception ex){	//gotta catch 'em all!
 			System.out.println(ex);
 		}
 		

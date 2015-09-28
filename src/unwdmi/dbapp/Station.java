@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by metoray on 24-9-15.
@@ -12,19 +13,20 @@ public class Station {
 
     private int id;
     private EnumMap<MeasurementType,LinkedList<Number>> measurements;
-    private LinkedList<Date> dates;
+    private Date lastDate;
+    private BlockingQueue<Measurement> outputQueue;
 
-    public Station(int id){
+    public Station(int id, BlockingQueue<Measurement> outputQueue){
         this.id = id;
         this.measurements = new EnumMap<MeasurementType,LinkedList<Number>>(MeasurementType.class);
-        this.dates = new LinkedList<>();
+        this.outputQueue = outputQueue;
         for(MeasurementType type: MeasurementType.values()){
             this.measurements.put(type,new LinkedList<Number>());
         }
     }
 
-    public void addMeasurement(Measurement measurement){
-        dates.add(measurement.getDate());
+    public synchronized void addMeasurement(Measurement measurement){
+        lastDate = measurement.getDate();
         for (MeasurementType type: measurements.keySet()){
             LinkedList<Number> data = measurements.get(type);
             Number value;
@@ -41,14 +43,19 @@ public class Station {
                 data.pop();
             }
         }
+        try {
+            outputQueue.put(getLastMeasurement());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    public Measurement getLastMeasurement(){
+    private synchronized Measurement getLastMeasurement(){
         EnumMap<MeasurementType,Number> data = new EnumMap<MeasurementType, Number>(MeasurementType.class);
         for(Map.Entry<MeasurementType,LinkedList<Number>> entry: measurements.entrySet()){
             data.put(entry.getKey(),entry.getValue().peekLast());
         }
-        return new Measurement(this.id,dates.peekLast(),data);
+        return new Measurement(this.id,lastDate,data);
     }
 
 }

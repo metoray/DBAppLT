@@ -16,7 +16,8 @@ public enum MeasurementType {
     PRCP("rainfall"),
     SNDP("snowdepth"),
     CLDC("cloudcoverage"),
-    WNDDIR("winddirection");
+    WNDDIR("winddirection"),
+    FRSHTT("???");
 
     private String dbName;
 
@@ -33,6 +34,8 @@ public enum MeasurementType {
             switch (this) {
                 case WNDDIR:
                     return Integer.parseInt(s);
+                case FRSHTT:
+                    return Integer.parseInt(s,2);
                 default:
                     return Double.parseDouble(s);
             }
@@ -58,7 +61,7 @@ public enum MeasurementType {
             totalChange += d- lastValue;
             lastValue = d;
         }
-        double avgChange = totalChange / data.size();
+        double avgChange = totalChange / (data.size() - 1);
         return lastValue + avgChange;
     }
 
@@ -101,7 +104,7 @@ public enum MeasurementType {
                 change += 180;
             totalChange += change;
         }
-        int avgChange = totalChange / data.size();
+        int avgChange = totalChange / (data.size() - 1);
         return ((last + avgChange) % 360 + 360) % 360;
     }
 
@@ -113,6 +116,9 @@ public enum MeasurementType {
     public Number extrapolateValue(List<Number> data) {
         if(this==WNDDIR) {
             return extrapolateWindDir(data);
+        }
+        if(this==FRSHTT){
+            return new Integer(0);
         }
         return extrapolate(data);
     }
@@ -126,6 +132,9 @@ public enum MeasurementType {
     public Number correctValue(List<Number> data, Number value) {
         if(this==TEMP) {
             return extrapolateTemperature(data,(double)value);
+        }
+        else if(this==FRSHTT){
+            return value;
         }
         return value;
     }
