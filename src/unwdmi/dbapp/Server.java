@@ -27,9 +27,7 @@ public class Server {
     private static final int PASSER_THREADS = 8;
     private BlockingQueue<Measurement>[] queues;
 
-    private static final int DB_PASSER_THREADS = 1;
-    private BlockingQueue<Measurement>[] dbQueues;
-    private int dbqIndex = 0;
+    private BlockingQueue<Measurement> fileQueue = new LinkedTransferQueue<>();
 
     public Server(){
         stations = new HashMap<>();
@@ -43,23 +41,14 @@ public class Server {
         ServerSocket sock = new ServerSocket(7789);
         SAXParserFactory factory = SAXParserFactory.newInstance();
         queues = new BlockingQueue[PASSER_THREADS];
-        dbQueues = new BlockingQueue[DB_PASSER_THREADS];
         for(int i=0; i<PASSER_THREADS; i++){
             BlockingQueue<Measurement> queue = new LinkedTransferQueue<>();
             MeasurementPasser mp = new MeasurementPasser(queue,"STN");
             mp.start();
             queues[i] = queue;
         }
-        for(int i=0; i<DB_PASSER_THREADS; i++){
-            BlockingQueue<Measurement> queue = new LinkedTransferQueue<>();
-            DatabaseConsumer dc = new DatabaseConsumer(queue);
-            dc.start();
-            dbQueues[i] = queue;
-        }
         QueueMonitor qm = new QueueMonitor(queues,"STN");
         qm.start();
-        QueueMonitor dbqm = new QueueMonitor(dbQueues,"DB");
-        dbqm.start();
         int queueIndex = 0;
         while(true) {
             try {
@@ -77,14 +66,8 @@ public class Server {
 
     public synchronized Station getStation(int id){
         if(!this.stations.containsKey(id)){
-            this.stations.put(id,new Station(id,getDBPasser()));
+            this.stations.put(id,new Station(id));
         }
         return this.stations.get(id);
-    }
-
-    public BlockingQueue<Measurement> getDBPasser(){
-        dbqIndex++;
-        dbqIndex%=dbQueues.length;
-        return dbQueues[dbqIndex];
     }
 }

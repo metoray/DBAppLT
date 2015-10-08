@@ -14,12 +14,10 @@ public class Station {
     private int id;
     private EnumMap<MeasurementType,LinkedList<Number>> measurements;
     private Date lastDate;
-    private BlockingQueue<Measurement> outputQueue;
 
-    public Station(int id, BlockingQueue<Measurement> outputQueue){
+    public Station(int id){
         this.id = id;
-        this.measurements = new EnumMap<MeasurementType,LinkedList<Number>>(MeasurementType.class);
-        this.outputQueue = outputQueue;
+        this.measurements = new EnumMap<>(MeasurementType.class);
         for(MeasurementType type: MeasurementType.values()){
             this.measurements.put(type,new LinkedList<Number>());
         }
@@ -43,11 +41,7 @@ public class Station {
                 data.pop();
             }
         }
-        try {
-            outputQueue.put(getLastMeasurement());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        //TODO: PUT FILE OUTPUT HERE
     }
 
     private synchronized Measurement getLastMeasurement(){
