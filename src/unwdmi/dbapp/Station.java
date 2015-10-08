@@ -19,7 +19,7 @@ public class Station {
         this.id = id;
         this.measurements = new EnumMap<>(MeasurementType.class);
         for(MeasurementType type: MeasurementType.values()){
-            this.measurements.put(type,new LinkedList<Number>());
+            this.measurements.put(type, new LinkedList<Number>());
         }
     }
 
@@ -41,7 +41,7 @@ public class Station {
                 data.pop();
             }
         }
-        //TODO: PUT FILE OUTPUT HERE
+        System.out.println(StationFolderManager.getMeasurementFolder(getLastMeasurement()));//TODO: PUT FILE OUTPUT HERE
     }
 
     private synchronized Measurement getLastMeasurement(){
