@@ -23,6 +23,7 @@ public class StationFolderManager {
         else {
             Thread t = new Thread();
             t.start();
+            fileHandlers.put(path,t);
             return t;
         }
     }
