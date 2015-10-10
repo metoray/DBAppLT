@@ -74,6 +74,7 @@ public class FileHandler {
 
 			}
 			fileWriter.append("\n");
+			fileWriter.flush();
 			semaphore.release();
 		}
 		catch(Exception e){
@@ -201,7 +202,6 @@ public class FileHandler {
 	public void readMode(){
 		//closes writer, opens reader
 		try{
-			fileWriter.flush();
 			fileWriter.close();
 			fileReader = new BufferedReader( new FileReader(file));
 		}
