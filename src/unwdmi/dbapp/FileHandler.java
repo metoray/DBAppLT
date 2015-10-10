@@ -38,22 +38,33 @@ public class FileHandler extends Thread {
 	}
 	public File ensureFileExists(String path){
 		File newFile = new File(path);
-		if(!newFile.isFile()){
-			try{
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(newFile));
+			String[] columns = br.readLine().split(",");
+			this.types = new MeasurementType[columns.length-1];
+			for(int i=0; i<this.types.length; i++) {
+				this.types[i] = MeasurementType.fromDBName(columns[i+1]);
+			}
+			br.close();
+
+		} catch (FileNotFoundException ex) {
+			try {
 				newFile.getParentFile().mkdirs();
 				newFile.createNewFile();
 				BufferedWriter fos = new BufferedWriter(new FileWriter(newFile));
 				this.types = MeasurementType.values();
 				fos.append("time");
-				for(MeasurementType type: types) {
-					fos.append(","+type.getColumnName());
+				for (MeasurementType type : types) {
+					fos.append("," + type.getColumnName());
 				}
 				fos.append('\n');
 				fos.close();
-			}catch(Exception e){
-				System.out.println("Error in creating new file");
+			}
+			catch (IOException e) {
 				e.printStackTrace();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return newFile;
 	}
