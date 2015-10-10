@@ -49,6 +49,7 @@ public class FileHandler {
 		File newFile = new File(folderPath + fileName);
 		if(!newFile.isFile()){
 			try{
+				newFile.getParentFile().mkdirs();
 				newFile.createNewFile();
 			}catch(Exception e){
 				System.out.println("Error in creating new file");
