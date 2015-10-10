@@ -105,7 +105,7 @@ public class FileHandler extends Thread {
 			String data;
 			while((data = fileReader.readLine()) != null){
 				String[] tokens = data.split(",");
-				int typeToken = convertTypeToToken(type);
+				int typeToken = getTypeIndex(type);
 				if(requestedTime == tokens[TIME]){
 					return tokens[typeToken];
 				}
@@ -135,7 +135,7 @@ public class FileHandler extends Thread {
 				lastLine = data;
 			}
 			String[] tokens = lastLine.split(",");
-			data = tokens[convertTypeToToken(type)];
+			data = tokens[getTypeIndex(type)];
 			
 			writeMode();
 			semaphore.release();
@@ -158,10 +158,10 @@ public class FileHandler extends Thread {
 			//read info from file line by line
 			String data;
 			ArrayList<String> returnData = new ArrayList<String>();
-			int typeToken = convertTypeToToken(type);
+			int typeIndex = getTypeIndex(type);
 			while((data = fileReader.readLine()) != null){
 				String[] tokens = data.split(",");
-				returnData.add(tokens[typeToken]);
+				returnData.add(tokens[typeIndex]);
 				
 			}
 			
@@ -176,35 +176,19 @@ public class FileHandler extends Thread {
 		System.out.println("Error while trying to find requested measurement.");
 		return null;
 	}
-	
-	private int convertTypeToToken(MeasurementType type){
-		int answer;
-		switch(type.toString()){
-		case "temperature": answer = TEMP;
-		break;
-		case "dewpoint": answer = DEWP;
-		break;
-		case "stationairpressure": answer = STP;
-		break;
-		case "seaairpressure": answer = SLP;
-		break;
-		case "visibility": answer = VISIB;
-		break;
-		case "windspeed": answer = WDSP;
-		break;
-		case "rainfall": answer = PRCP;
-		break;
-		case "snowdepth": answer = SNDP;
-		break;
-		case "cloudcoverage": answer = CLDC;
-		break;
-		case "winddirection": answer = WNDDIR;
-		break;
-		case "events": answer = FRSHTT;
-		break;
-		default: answer = TIME;
+
+	/**
+	 * Returns index of type in array from file
+	 * @param type requested type index
+	 * @return index of type in input array
+	 */
+	private int getTypeIndex(MeasurementType type){
+		for(int idx = 0; idx < this.types.length; idx++) {
+			if(this.types[idx] == type) {
+				return idx+1;
+			}
 		}
-	return answer;
+		return -1;
 	}
 
 
