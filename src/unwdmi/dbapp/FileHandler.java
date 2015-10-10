@@ -7,222 +7,204 @@ import java.util.ArrayList;
 
 public class FileHandler extends Thread {
 
-	private File file;
-	private BufferedWriter fileWriter = null;
-	private BufferedReader fileReader = null;
-	private MeasurementType[] types;
-	private final Semaphore semaphore = new Semaphore(1);
+    private File file;
+    private BufferedWriter fileWriter = null;
+    private BufferedReader fileReader = null;
+    private MeasurementType[] types;
+    private final Semaphore semaphore = new Semaphore(1);
 
-	private static final int TIME = 0;
-	private static final int TEMP = 1;
-	private static final int DEWP = 2;
-	private static final int STP = 3;
-	private static final int SLP = 4;
-	private static final int VISIB = 5;
-	private static final int WDSP = 6;
-	private static final int PRCP = 7;
-	private static final int SNDP = 8;
-	private static final int CLDC = 9;
-	private static final int WNDDIR = 10;
-	private static final int FRSHTT = 11;
+    private static final int TIME = 0;
 
-	public FileHandler(String path) {
-		file = ensureFileExists(path);
+    public FileHandler(String path) {
+        file = ensureFileExists(path);
 
-		//FileHandler is in writing mode by default
-		try{
-			writeMode();
-		}catch(Exception e){
-			System.out.println("Error in initiating read/write request");
-		}
-	}
-	public File ensureFileExists(String path){
-		File newFile = new File(path);
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(newFile));
-			String[] columns = br.readLine().split(",");
-			this.types = new MeasurementType[columns.length-1];
-			for(int i=0; i<this.types.length; i++) {
-				this.types[i] = MeasurementType.fromDBName(columns[i+1]);
-			}
-			br.close();
+        //FileHandler is in writing mode by default
+        try {
+            writeMode();
+        } catch (Exception e) {
+            System.out.println("Error in initiating read/write request");
+        }
+    }
 
-		} catch (FileNotFoundException ex) {
-			try {
-				newFile.getParentFile().mkdirs();
-				newFile.createNewFile();
-				BufferedWriter fos = new BufferedWriter(new FileWriter(newFile));
-				this.types = MeasurementType.values();
-				fos.append("time");
-				for (MeasurementType type : types) {
-					fos.append("," + type.getColumnName());
-				}
-				fos.append('\n');
-				fos.close();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return newFile;
-	}
+    public File ensureFileExists(String path) {
+        File newFile = new File(path);
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(newFile));
+            String[] columns = br.readLine().split(",");
+            this.types = new MeasurementType[columns.length - 1];
+            for (int i = 0; i < this.types.length; i++) {
+                this.types[i] = MeasurementType.fromDBName(columns[i + 1]);
+            }
+            br.close();
 
-	public void addMeasurement(Measurement m){
-		try{
-			semaphore.acquire();
+        } catch (FileNotFoundException ex) {
+            try {
+                newFile.getParentFile().mkdirs();
+                newFile.createNewFile();
+                BufferedWriter fos = new BufferedWriter(new FileWriter(newFile));
+                this.types = MeasurementType.values();
+                fos.append("time");
+                for (MeasurementType type : types) {
+                    fos.append("," + type.getColumnName());
+                }
+                fos.append('\n');
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return newFile;
+    }
 
-			//send measurement time MM:SS
-			SimpleDateFormat timeFormat = new SimpleDateFormat("mm:ss");
-			String time = timeFormat.format(m.getDate());
-			fileWriter.append(time);
-			//send data
-			for(MeasurementType type: types){
-				fileWriter.append(",");
-				fileWriter.append(m.getData(type).toString());
+    public void addMeasurement(Measurement m) {
+        try {
+            semaphore.acquire();
 
-			}
-			fileWriter.append("\n");
-			fileWriter.flush();
-			semaphore.release();
-		}
-		catch(Exception e){
-			System.out.println("Error in csv writer.");
-			e.printStackTrace();
-		}
-	}
+            //send measurement time MM:SS
+            SimpleDateFormat timeFormat = new SimpleDateFormat("mm:ss");
+            String time = timeFormat.format(m.getDate());
+            fileWriter.append(time);
+            //send data
+            for (MeasurementType type : types) {
+                fileWriter.append(",");
+                fileWriter.append(m.getData(type).toString());
+
+            }
+            fileWriter.append("\n");
+            fileWriter.flush();
+            semaphore.release();
+        } catch (Exception e) {
+            System.out.println("Error in csv writer.");
+            e.printStackTrace();
+        }
+    }
 
 
-	
-	public String readMeasurement(String requestedTime, MeasurementType type){
-		try{
-			semaphore.acquire();
+    public String readMeasurement(String requestedTime, MeasurementType type) {
+        try {
+            semaphore.acquire();
 
-			readMode();
+            readMode();
 
-			//read info from file line by line
-			String data;
-			while((data = fileReader.readLine()) != null){
-				String[] tokens = data.split(",");
-				int typeToken = getTypeIndex(type);
-				if(requestedTime == tokens[TIME]){
-					return tokens[typeToken];
-				}
-			}
-			writeMode();
-			semaphore.release();
-		}
-		catch(Exception e){
-			System.out.println("Error in csv reader");
-		}
+            //read info from file line by line
+            String data;
+            while ((data = fileReader.readLine()) != null) {
+                String[] tokens = data.split(",");
+                int typeToken = getTypeIndex(type);
+                if (requestedTime == tokens[TIME]) {
+                    return tokens[typeToken];
+                }
+            }
+            writeMode();
+            semaphore.release();
+        } catch (Exception e) {
+            System.out.println("Error in csv reader");
+        }
 
-		System.out.println("Error while trying to find requested measurement.");
-		return null;
-	}
+        System.out.println("Error while trying to find requested measurement.");
+        return null;
+    }
 
 
-	public String readLastMeasurement(MeasurementType type){
-		try{
-			semaphore.acquire();
+    public String readLastMeasurement(MeasurementType type) {
+        try {
+            semaphore.acquire();
 
-			readMode();
+            readMode();
 
-			//read through file until the last line
-			String data;
-			String lastLine = "";
-			while((data = fileReader.readLine()) != null){
-				lastLine = data;
-			}
-			String[] tokens = lastLine.split(",");
-			data = tokens[getTypeIndex(type)];
-			
-			writeMode();
-			semaphore.release();
-			return data;
-		}
-		catch(Exception e){
-			System.out.println("Error in csv reader");
-		}
+            //read through file until the last line
+            String data;
+            String lastLine = "";
+            while ((data = fileReader.readLine()) != null) {
+                lastLine = data;
+            }
+            String[] tokens = lastLine.split(",");
+            data = tokens[getTypeIndex(type)];
 
-		System.out.println("Error while trying to find requested measurement.");
-		return null;
-	}
-	
-	public ArrayList<String> readAllFromType(MeasurementType type){
-		try{
-			semaphore.acquire();
+            writeMode();
+            semaphore.release();
+            return data;
+        } catch (Exception e) {
+            System.out.println("Error in csv reader");
+        }
 
-			readMode();
+        System.out.println("Error while trying to find requested measurement.");
+        return null;
+    }
 
-			//read info from file line by line
-			String data;
-			ArrayList<String> returnData = new ArrayList<String>();
-			int typeIndex = getTypeIndex(type);
-			while((data = fileReader.readLine()) != null){
-				String[] tokens = data.split(",");
-				returnData.add(tokens[typeIndex]);
-				
-			}
-			
-			writeMode();
-			semaphore.release();
-			return returnData;
-		}
-		catch(Exception e){
-			System.out.println("Error in csv reader");
-		}
+    public ArrayList<String> readAllFromType(MeasurementType type) {
+        try {
+            semaphore.acquire();
 
-		System.out.println("Error while trying to find requested measurement.");
-		return null;
-	}
+            readMode();
 
-	/**
-	 * Returns index of type in array from file
-	 * @param type requested type index
-	 * @return index of type in input array
-	 */
-	private int getTypeIndex(MeasurementType type){
-		for(int idx = 0; idx < this.types.length; idx++) {
-			if(this.types[idx] == type) {
-				return idx+1;
-			}
-		}
-		return -1;
-	}
+            //read info from file line by line
+            String data;
+            ArrayList<String> returnData = new ArrayList<String>();
+            int typeIndex = getTypeIndex(type);
+            while ((data = fileReader.readLine()) != null) {
+                String[] tokens = data.split(",");
+                returnData.add(tokens[typeIndex]);
 
+            }
+
+            writeMode();
+            semaphore.release();
+            return returnData;
+        } catch (Exception e) {
+            System.out.println("Error in csv reader");
+        }
+
+        System.out.println("Error while trying to find requested measurement.");
+        return null;
+    }
+
+    /**
+     * Returns index of type in array from file
+     *
+     * @param type requested type index
+     * @return index of type in input array
+     */
+    private int getTypeIndex(MeasurementType type) {
+        for (int idx = 0; idx < this.types.length; idx++) {
+            if (this.types[idx] == type) {
+                return idx + 1;
+            }
+        }
+        return -1;
+    }
 
 
-	public void readMode(){
-		//closes writer, opens reader
-		try{
-			fileWriter.close();
-			fileReader = new BufferedReader( new FileReader(file));
-		}
-		catch(Exception e){
-			System.out.println("Error while switching FileHandler to read mode");
-		}
+    public void readMode() {
+        //closes writer, opens reader
+        try {
+            fileWriter.close();
+            fileReader = new BufferedReader(new FileReader(file));
+        } catch (Exception e) {
+            System.out.println("Error while switching FileHandler to read mode");
+        }
 
-	}
+    }
 
-	public void writeMode(){
-		try{
-			//closes reader, reopens writer
-			fileReader.close();
-			fileWriter = new BufferedWriter(new FileWriter(file));
-		}
-		catch(Exception e){
-			System.out.println("Error while switching FileHandler to write mode");
-		}	
-	}
-	
-	public void close(){
-		try{
-			//closes writer
-			fileWriter.close();
-		}catch(Exception e){
-			System.out.println("error while closing");
-			e.printStackTrace();
-		}
-	}
+    public void writeMode() {
+        try {
+            //closes reader, reopens writer
+            fileReader.close();
+            fileWriter = new BufferedWriter(new FileWriter(file));
+        } catch (Exception e) {
+            System.out.println("Error while switching FileHandler to write mode");
+        }
+    }
+
+    public void close() {
+        try {
+            //closes writer
+            fileWriter.close();
+        } catch (Exception e) {
+            System.out.println("error while closing");
+            e.printStackTrace();
+        }
+    }
 }
