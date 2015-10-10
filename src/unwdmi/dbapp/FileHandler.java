@@ -8,6 +8,7 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.Semaphore;
 import java.io.File;
+import java.util.ArrayList;
 
 public class FileHandler {
 
@@ -31,13 +32,6 @@ public class FileHandler {
 	private static final int CLDC = 9;
 	private static final int WNDDIR = 10;
 	private static final int FRSHTT = 11;
-
-	/*
-	 * check if file exists, else make it
-	 * write data to file: open in write mode, then write in csv format
-	 * read data from file: close file, open in read mode, read, close, open in write mode
-	 * 
-	 */
 
 	public FileHandler(String fileName, String folderPath){
 		this.folderPath = folderPath;
@@ -87,6 +81,8 @@ public class FileHandler {
 		}
 	}
 
+
+	
 	public String readMeasurement(String requestedTime, MeasurementType type){
 		try{
 			semaphore.acquire();
@@ -94,16 +90,12 @@ public class FileHandler {
 			readMode();
 
 			//read info from file line by line
-			String info;
-			while((info = fileReader.readLine()) != null){
-				String[] tokens = info.split(",");
-				String tokenTime = tokens[TIME];
-				if(requestedTime == tokenTime){
-					for(String token: tokens){
-						if(token == type.toString()){
-							return token;
-						}
-					}
+			String data;
+			while((data = fileReader.readLine()) != null){
+				String[] tokens = data.split(",");
+				int typeToken = convertTypeToToken(type);
+				if(requestedTime == tokens[TIME]){
+					return tokens[typeToken];
 				}
 			}
 			writeMode();
@@ -113,7 +105,7 @@ public class FileHandler {
 			System.out.println("Error in csv reader");
 		}
 
-		System.out.println("Requested measurement could not be found.");
+		System.out.println("Error while trying to find requested measurement.");
 		return null;
 	}
 
@@ -125,27 +117,82 @@ public class FileHandler {
 			readMode();
 
 			//read through file until the last line
-			String info;
+			String data;
 			String lastLine = "";
-			while((info = fileReader.readLine()) != null){
-				lastLine = info;
+			while((data = fileReader.readLine()) != null){
+				lastLine = data;
 			}
 			String[] tokens = lastLine.split(",");
-			for(String token: tokens){
-				if(token == type.toString()){
-					return token;
-				}
-			}
-
+			data = tokens[convertTypeToToken(type)];
+			
 			writeMode();
 			semaphore.release();
+			return data;
 		}
 		catch(Exception e){
 			System.out.println("Error in csv reader");
 		}
 
-		System.out.println("Requested measurement could not be found.");
+		System.out.println("Error while trying to find requested measurement.");
 		return null;
+	}
+	
+	public ArrayList<String> readAllFromType(MeasurementType type){
+		try{
+			semaphore.acquire();
+
+			readMode();
+
+			//read info from file line by line
+			String data;
+			ArrayList<String> returnData = new ArrayList<String>();
+			int typeToken = convertTypeToToken(type);
+			while((data = fileReader.readLine()) != null){
+				String[] tokens = data.split(",");
+				returnData.add(tokens[typeToken]);
+				
+			}
+			
+			writeMode();
+			semaphore.release();
+			return returnData;
+		}
+		catch(Exception e){
+			System.out.println("Error in csv reader");
+		}
+
+		System.out.println("Error while trying to find requested measurement.");
+		return null;
+	}
+	
+	private int convertTypeToToken(MeasurementType type){
+		int answer;
+		switch(type.toString()){
+		case "temperature": answer = TEMP;
+		break;
+		case "dewpoint": answer = DEWP;
+		break;
+		case "stationairpressure": answer = STP;
+		break;
+		case "seaairpressure": answer = SLP;
+		break;
+		case "visibility": answer = VISIB;
+		break;
+		case "windspeed": answer = WDSP;
+		break;
+		case "rainfall": answer = PRCP;
+		break;
+		case "snowdepth": answer = SNDP;
+		break;
+		case "cloudcoverage": answer = CLDC;
+		break;
+		case "winddirection": answer = WNDDIR;
+		break;
+		case "events": answer = FRSHTT;
+		break;
+		default: answer = TIME;
+		}
+	return answer;
 	}
 
 
