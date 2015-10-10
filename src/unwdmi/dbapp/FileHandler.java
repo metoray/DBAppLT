@@ -1,13 +1,8 @@
 package unwdmi.dbapp;
 
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.util.Date;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.Semaphore;
-import java.io.File;
 import java.util.ArrayList;
 
 public class FileHandler extends Thread {
@@ -47,6 +42,14 @@ public class FileHandler extends Thread {
 			try{
 				newFile.getParentFile().mkdirs();
 				newFile.createNewFile();
+				BufferedWriter fos = new BufferedWriter(new FileWriter(newFile));
+				this.types = MeasurementType.values();
+				fos.append("time");
+				for(MeasurementType type: types) {
+					fos.append(","+type.getColumnName());
+				}
+				fos.append('\n');
+				fos.close();
 			}catch(Exception e){
 				System.out.println("Error in creating new file");
 				e.printStackTrace();
@@ -221,7 +224,6 @@ public class FileHandler extends Thread {
 	public void close(){
 		try{
 			//closes writer
-			fileWriter.flush();
 			fileWriter.close();
 		}catch(Exception e){
 			System.out.println("error while closing");
