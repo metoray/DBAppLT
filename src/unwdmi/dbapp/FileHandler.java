@@ -19,11 +19,7 @@ public class FileHandler extends Thread {
         file = ensureFileExists(path);
 
         //FileHandler is in writing mode by default
-        try {
-            writeMode();
-        } catch (Exception e) {
-            System.out.println("Error in initiating read/write request");
-        }
+        writeMode();
     }
 
     public File ensureFileExists(String path) {
@@ -207,4 +203,5 @@ public class FileHandler extends Thread {
             e.printStackTrace();
         }
     }
+
 }
