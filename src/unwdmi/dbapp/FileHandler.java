@@ -10,14 +10,12 @@ import java.util.concurrent.Semaphore;
 import java.io.File;
 import java.util.ArrayList;
 
-public class FileHandler {
+public class FileHandler extends Thread {
 
-	private String fileName;
-	private String folderPath;
 	private File file;
 	private BufferedWriter fileWriter = null;
 	private BufferedReader fileReader = null;
-	private MeasurementType[] types = MeasurementType.values();
+	private MeasurementType[] types;
 	private final Semaphore semaphore = new Semaphore(1);
 
 	private static final int TIME = 0;
@@ -33,10 +31,8 @@ public class FileHandler {
 	private static final int WNDDIR = 10;
 	private static final int FRSHTT = 11;
 
-	public FileHandler(String fileName, String folderPath){
-		this.folderPath = folderPath;
-		this.fileName = fileName;
-		file = ensureFileExists();
+	public FileHandler(String path) {
+		file = ensureFileExists(path);
 
 		//FileHandler is in writing mode by default
 		try{
@@ -45,8 +41,8 @@ public class FileHandler {
 			System.out.println("Error in initiating read/write request");
 		}
 	}
-	public File ensureFileExists(){
-		File newFile = new File(folderPath + fileName);
+	public File ensureFileExists(String path){
+		File newFile = new File(path);
 		if(!newFile.isFile()){
 			try{
 				newFile.getParentFile().mkdirs();

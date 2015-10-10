@@ -5,10 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.ConcurrentHashMap;
 
-//TODO: Replace 'Thread' with actual filehandler objects
 public class StationFolderManager {
 
-    private static ConcurrentHashMap<String,Thread> fileHandlers = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String,FileHandler> fileHandlers = new ConcurrentHashMap<>();
 
     public static String DATA_FOLDER = "data";
 
@@ -23,19 +22,19 @@ public class StationFolderManager {
         return c.get(Calendar.HOUR_OF_DAY)+".csv";
     }
 
-    public static Thread getFileHandler(Measurement m){
+    public static FileHandler getFileHandler(Measurement m){
         return getFileHandler(getMeasurementFolder(m)+getFileName(m));
     }
 
-    public static Thread getFileHandler(String path) {
+    public static FileHandler getFileHandler(String path) {
         if(!fileHandlers.containsValue(path)){
             return fileHandlers.get(path);
         }
         else {
-            Thread t = new Thread();
-            t.start();
-            fileHandlers.put(path,t);
-            return t;
+            FileHandler fh = new FileHandler(path);
+            fh.start();
+            fileHandlers.put(path,fh);
+            return fh;
         }
     }
 

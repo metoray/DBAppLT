@@ -141,4 +141,13 @@ public enum MeasurementType {
         }
         return value;
     }
+
+    public static MeasurementType fromDBName(String dbName) {
+        for(MeasurementType type: MeasurementType.values()){
+            if(type.getColumnName().equals(dbName)){
+                return  type;
+            }
+        }
+        return null;
+    }
 }
