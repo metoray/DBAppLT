@@ -41,7 +41,7 @@ public class Station {
                 data.pop();
             }
         }
-        System.out.println(StationFolderManager.getMeasurementFolder(getLastMeasurement()));//TODO: PUT FILE OUTPUT HERE
+        StationFolderManager.getFileHandler(getLastMeasurement()).getQueue().add(getLastMeasurement()); //What!?
     }
 
     private synchronized Measurement getLastMeasurement(){

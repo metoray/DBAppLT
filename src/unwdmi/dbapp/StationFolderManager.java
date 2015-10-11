@@ -23,16 +23,20 @@ public class StationFolderManager {
     }
 
     public static FileHandler getFileHandler(Measurement m){
-        return getFileHandler(getMeasurementFolder(m)+getFileName(m));
+        return getFileHandler(getMeasurementFolder(m)+getFileName(m), true, m.getStationID());
     }
 
-    public static FileHandler getFileHandler(String path) {
-        if(!fileHandlers.containsValue(path)){
-            return fileHandlers.get(path);
+    public static FileHandler getFileHandler(String path, boolean write, int station) {
+        if(fileHandlers.containsValue(path)){
+            FileHandler fh = fileHandlers.get(path);
+            if(write&&!fh.isAlive()) {
+                fileHandlers.remove(path);
+                return getFileHandler(path,write,station);
+            }
+            return fh;
         }
         else {
-            FileHandler fh = new FileHandler(path);
-            fh.start();
+            FileHandler fh = new FileHandler(new File(path), write, station);
             fileHandlers.put(path,fh);
             return fh;
         }
