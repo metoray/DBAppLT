@@ -14,33 +14,22 @@ public class FileHandler extends Thread {
 	private final Semaphore semaphore = new Semaphore(1);
 
 	private static final int TIME = 0;
-	private static final int TEMP = 1;
-	private static final int DEWP = 2;
-	private static final int STP = 3;
-	private static final int SLP = 4;
-	private static final int VISIB = 5;
-	private static final int WDSP = 6;
-	private static final int PRCP = 7;
-	private static final int SNDP = 8;
-	private static final int CLDC = 9;
-	private static final int WNDDIR = 10;
-	private static final int FRSHTT = 11;
 
 	public FileHandler(String path) {
 		file = ensureFileExists(path);
 
 		//FileHandler is in writing mode by default
-
 		writeMode();
 	}
-	public File ensureFileExists(String path){
+
+	public File ensureFileExists(String path) {
 		File newFile = new File(path);
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(newFile));
 			String[] columns = br.readLine().split(",");
-			this.types = new MeasurementType[columns.length-1];
-			for(int i=0; i<this.types.length; i++) {
-				this.types[i] = MeasurementType.fromDBName(columns[i+1]);
+			this.types = new MeasurementType[columns.length - 1];
+			for (int i = 0; i < this.types.length; i++) {
+				this.types[i] = MeasurementType.fromDBName(columns[i + 1]);
 			}
 			br.close();
 
@@ -56,8 +45,7 @@ public class FileHandler extends Thread {
 				}
 				fos.append('\n');
 				fos.close();
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} catch (IOException e) {
@@ -70,7 +58,7 @@ public class FileHandler extends Thread {
 		try{
 			semaphore.acquire();
 		}catch(InterruptedException ie){
-			System.out.println("Acquiring semaphore interrupted during read.");
+			System.out.println("Acquiring semaphore interrupted while adding measurement.");
 		}
 		//send measurement time MM:SS
 		SimpleDateFormat timeFormat = new SimpleDateFormat("mm:ss");
@@ -91,22 +79,23 @@ public class FileHandler extends Thread {
 		}
 	}
 
-	public String readMeasurement(String requestedTime, MeasurementType type){
+
+	public String readMeasurement(String requestedTime, MeasurementType type) {
 		try{
 			semaphore.acquire();
 		}catch(InterruptedException ie){
 			System.out.println("Acquiring semaphore interrupted during read.");
 		}
-		
+
 		readMode();
 
-		//read info from file line by line
-		String data;
 		try{
-			while((data = fileReader.readLine()) != null){
+			//read info from file line by line
+			String data;
+			while ((data = fileReader.readLine()) != null) {
 				String[] tokens = data.split(",");
 				int typeToken = getTypeIndex(type);
-				if(requestedTime == tokens[TIME]){
+				if (requestedTime == tokens[TIME]) {
 					return tokens[typeToken];
 				}
 			}
@@ -121,7 +110,8 @@ public class FileHandler extends Thread {
 		return null;
 	}
 
-	public String readLastMeasurement(MeasurementType type){
+
+	public String readLastMeasurement(MeasurementType type) {
 		try{
 			semaphore.acquire();
 		}catch(InterruptedException ie){
@@ -130,12 +120,11 @@ public class FileHandler extends Thread {
 		
 		readMode();
 
-		//read through file until the last line
-		String data;
-		String lastLine = "";
-
 		try{
-			while((data = fileReader.readLine()) != null){
+			//read through file until the last line
+			String data;
+			String lastLine = "";
+			while ((data = fileReader.readLine()) != null) {
 				lastLine = data;
 			}
 			String[] tokens = lastLine.split(",");
@@ -146,38 +135,38 @@ public class FileHandler extends Thread {
 			return data;
 		}
 		catch(IOException e){
-			System.out.println("IOException while reading measurement");
+			System.out.println("IOEXception while reading measurement");
 		}
 
 		System.out.println("Could not find requested measurement.");
 		return null;
 	}
 
-	public ArrayList<String> readAllFromType(MeasurementType type){
+	public ArrayList<String> readAllFromType(MeasurementType type) {
 		try{
 			semaphore.acquire();
 		}catch(InterruptedException ie){
 			System.out.println("Acquiring semaphore interrupted during read.");
 		}
-		
 		readMode();
 
-		//read info from file line by line
-		String data;
-		ArrayList<String> returnData = new ArrayList<String>();
-		int typeIndex = getTypeIndex(type);
-
 		try{
-			while((data = fileReader.readLine()) != null){
+			//read info from file line by line
+			String data;
+			ArrayList<String> returnData = new ArrayList<String>();
+			int typeIndex = getTypeIndex(type);
+			while ((data = fileReader.readLine()) != null) {
 				String[] tokens = data.split(",");
 				returnData.add(tokens[typeIndex]);
+
 			}
+
 			writeMode();
 			semaphore.release();
 			return returnData;
 		}
 		catch(IOException e){
-			System.out.println("IOException while reading measurement");
+			System.out.println("IOEXception while reading measurement");
 		}
 
 		System.out.println("Could not find requested measurement.");
@@ -186,46 +175,46 @@ public class FileHandler extends Thread {
 
 	/**
 	 * Returns index of type in array from file
+	 *
 	 * @param type requested type index
 	 * @return index of type in input array
 	 */
-	private int getTypeIndex(MeasurementType type){
-		for(int idx = 0; idx < this.types.length; idx++) {
-			if(this.types[idx] == type) {
-				return idx+1;
+	private int getTypeIndex(MeasurementType type) {
+		for (int idx = 0; idx < this.types.length; idx++) {
+			if (this.types[idx] == type) {
+				return idx + 1;
 			}
 		}
 		return -1;
 	}
 
-	public void readMode(){
+
+	public void readMode() {
 		//closes writer, opens reader
-		try{
+		try {
 			fileWriter.close();
-			fileReader = new BufferedReader( new FileReader(file));
-		}
-		catch(Exception e){
+			fileReader = new BufferedReader(new FileReader(file));
+		} catch (Exception e) {
 			System.out.println("Error while switching FileHandler to read mode");
 		}
 
 	}
 
-	public void writeMode(){
-		try{
+	public void writeMode() {
+		try {
 			//closes reader, reopens writer
 			fileReader.close();
 			fileWriter = new BufferedWriter(new FileWriter(file));
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			System.out.println("Error while switching FileHandler to write mode");
-		}	
+		}
 	}
 
-	public void close(){
-		try{
+	public void close() {
+		try {
 			//closes writer
 			fileWriter.close();
-		}catch(IOException e){
+		} catch (Exception e) {
 			System.out.println("error while closing");
 			e.printStackTrace();
 		}
